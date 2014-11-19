@@ -1,0 +1,46 @@
+{
+  "name": "computed-property",
+  "description": "Add computed properties to JavaScript objects.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/doowb/computed-property",
+  "author": {
+    "name": "Brian Woodward",
+    "url": "https://github.com/doowb"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/doowb/computed-property.git"
+  },
+  "bugs": {
+    "url": "https://github.com/doowb/computed-property/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/doowb/computed-property/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "^4.3.0"
+  },
+  "keywords": [
+    "docs",
+    "documentation",
+    "generate",
+    "generator",
+    "markdown",
+    "templates",
+    "verb"
+  ],
+  "dependencies": {
+    "lodash": "^2.4.1"
+  }
+}
