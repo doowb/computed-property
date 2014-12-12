@@ -8,6 +8,8 @@
 'use strict';
 
 var _ = require('lodash');
+var get = require('get-value');
+var set = require('set-object');
 
 /**
  * Add a computed property to an object. This updates
@@ -18,22 +20,25 @@ var _ = require('lodash');
  * var file = {
  *   name: 'home-page',
  *   ext: '.hbs',
- *   dirname: 'views'
+ *   dirname: 'views',
+ *   data: {
+ *     title: 'Home'
+ *   }
  * };
- * 
+ *
  * computedProperty(
  *   // object
  *   file,
  *   // property name
  *   'path',
- *   // optional dependencies
- *   ['name', 'ext', 'dirname'],
+ *   // optional dependencies (may be deeply nested)
+ *   ['name', 'ext', 'dirname', 'data.title'],
  *   // getter function
  *   function () {
  *     return this.dirname + '/' + this.name + this.ext;
  *   });
  * ```
- * 
+ *
  * @param  {Object}   `obj` Object to add the property to.
  * @param  {Function} `name` Name of the property.
  * @param  {Array}    `dependencies` Optional list of properties to depend on.
@@ -71,7 +76,7 @@ module.exports = function computedProperty (obj, name, dependencies, getter) {
 
 /**
  * Setup the storage object for watching dependencies.
- * 
+ *
  * @param  {Object}  `obj`          Object property is being added to.
  * @param  {Object}  `prev`         Object used for storage.
  * @param  {Array}   `dependencies` Dependencies to watch
@@ -87,8 +92,8 @@ function initWatch (obj, prev, dependencies) {
     var i = 0;
     while (len--) {
       var dep = dependencies[i++];
-      var value = _.cloneDeep(obj[dep]);
-      prev[dep] = value;
+      var value = _.cloneDeep(get(obj, dep));
+      set(prev, dep, value);
     }
   }
   return watch;
@@ -110,10 +115,10 @@ function changed (prev, current, dependencies) {
   var result = false;
   while (len--) {
     var dep = dependencies[i++];
-    var value = current[dep];
-    if (prev[dep] !== value) {
+    var value = get(current, dep);
+    if (get(prev, dep) !== value) {
       result = true;
-      prev[dep] = value;
+      set(prev, dep, value);
     }
   }
   return result;

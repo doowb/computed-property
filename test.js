@@ -43,6 +43,23 @@ describe('.computedProperty():', function () {
     obj.path.should.equal('_gh_pages/home.html');
   });
 
+  it('should add a computed property to an object with deep dependencies.', function () {
+    var obj = {
+      name: {
+        first: 'Brian',
+        middle: 'G',
+        last: 'Woodward'
+      }
+    };
+    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function () {
+      return this.name.first + ' ' + this.name.last;
+    });
+
+    obj.fullname.should.eql('Brian Woodward');
+    obj.name.first = 'Bryan';
+    obj.fullname.should.eql('Bryan Woodward');
+  });
+
   it('should add a computed property to an object with dependencies where a non dependency changes.', function () {
     var obj = {
       name: 'home',
@@ -56,5 +73,21 @@ describe('.computedProperty():', function () {
     obj.path.should.equal('views/home.hbs');
     obj.name = 'foo';
     obj.path.should.equal('views/home.hbs');
+  });
+
+  it('should add a computed property to an object with deep dependencies where a non dependency changes.', function () {
+    var obj = {
+      name: {
+        first: 'Brian',
+        middle: 'G',
+        last: 'Woodward'
+      }
+    };
+    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function () {
+      return this.name.first + ' ' + this.name.middle + '. ' + this.name.last;
+    });
+    obj.fullname.should.eql('Brian G. Woodward');
+    obj.name.middle = 'g';
+    obj.fullname.should.eql('Brian G. Woodward');
   });
 });
