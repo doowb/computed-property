@@ -1,7 +1,7 @@
 {
   "name": "computed-property",
   "description": "Add computed properties to JavaScript objects.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/doowb/computed-property",
   "author": {
     "name": "Brian Woodward",
