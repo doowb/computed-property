@@ -40,14 +40,14 @@ var set = require('set-object');
  * ```
  *
  * @param  {Object}   `obj` Object to add the property to.
- * @param  {Function} `name` Name of the property.
+ * @param  {String} `property` Name of the property.
  * @param  {Array}    `dependencies` Optional list of properties to depend on.
  * @param  {Function} `getter` Getter function that does the calculation.
  * @api public
  * @name  computedProperty
  */
 
-module.exports = function computedProperty (obj, name, dependencies, getter) {
+module.exports = function computedProperty (obj, property, dependencies, getter) {
   if (typeof dependencies === 'function') {
     getter = dependencies;
     dependencies = [];
@@ -58,17 +58,18 @@ module.exports = function computedProperty (obj, name, dependencies, getter) {
 
   dependencies = [].concat.apply([], dependencies);
   var prev = {};
-  prev[name] = undefined;
-  var watch = initWatch(obj, prev, dependencies);
+  var isWatching = initWatch(obj, prev, dependencies);
+  var wasComputed = false;
 
-  Object.defineProperty(obj, name, {
+  Object.defineProperty(obj, property, {
     configurable: true,
     enumerable: true,
     get: function () {
-      if (!watch || prev[name] == undefined || changed(prev, this, dependencies)) {
-        prev[name] = getter.call(this);
+      if (!isWatching || !wasComputed || changed(prev, this, dependencies)) {
+        prev[property] = getter.call(this);
+        wasComputed = true;
       }
-      return prev[name];
+      return prev[property];
     },
     set: function () { }
   });
@@ -85,18 +86,17 @@ module.exports = function computedProperty (obj, name, dependencies, getter) {
  */
 
 function initWatch (obj, prev, dependencies) {
-  var watch = false;
   var len = dependencies.length;
-  if (len > 0) {
-    watch = true;
-    var i = 0;
-    while (len--) {
+  if (len === 0) {
+      return false;
+  }
+  var i = 0;
+  while (len--) {
       var dep = dependencies[i++];
       var value = _.cloneDeep(get(obj, dep));
       set(prev, dep, value);
-    }
   }
-  return watch;
+  return true;
 }
 
 /**
