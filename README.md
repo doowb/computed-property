@@ -26,10 +26,10 @@ var computedProperty = require('computed-property');
 
 Add a computed property to an object. This updates the property when dependent properties are updated.
 
-* `obj` **{Object}**: Object to add the property to.    
-* `name` **{Function}**: Name of the property.    
-* `dependencies` **{Array}**: Optional list of properties to depend on.    
-* `getter` **{Function}**: Getter function that does the calculation.    
+* `obj` **{Object}**: Object to add the property to.
+* `property` **{String}**: Name of the property.
+* `dependencies` **{Array}**: Optional list of properties to depend on.
+* `getter` **{Function}**: Getter function that does the calculation.
 
 ```js
 var computedProperty = require('computed-property');
@@ -62,12 +62,12 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 ## Author
 
 **Brian Woodward**
- 
+
 + [github/doowb](https://github.com/doowb)
-+ [twitter/doowb](http://twitter.com/doowb) 
++ [twitter/doowb](http://twitter.com/doowb)
 
 ## License
-Copyright (c) 2014 Brian Woodward  
+Copyright (c) 2014 Brian Woodward
 Released under the MIT license
 
 ***
