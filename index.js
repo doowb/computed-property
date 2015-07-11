@@ -7,7 +7,7 @@
 
 'use strict';
 
-var _ = require('lodash');
+var cloneDeep = require('lodash.clonedeep');
 var get = require('get-value');
 var set = require('set-object');
 
@@ -92,7 +92,7 @@ function initWatch (obj, prev, dependencies) {
     var i = 0;
     while (len--) {
       var dep = dependencies[i++];
-      var value = _.cloneDeep(get(obj, dep));
+      var value = cloneDeep(get(obj, dep));
       set(prev, dep, value);
     }
   }
