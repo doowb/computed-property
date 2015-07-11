@@ -20,6 +20,10 @@
       "url": "https://github.com/doowb/computed-property/blob/master/LICENSE-MIT"
     }
   ],
+  "files": [
+    "index.js",
+    "LICENSE-MIT"
+  ],
   "main": "index.js",
   "engines": {
     "node": ">=0.10.0"
