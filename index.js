@@ -53,7 +53,7 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
     dependencies = [];
   }
   if (typeof getter !== 'function') {
-    throw new Error('Expected `getter` to be a function but got ' + typeof getter);
+    throw new TypeError('Expected `getter` to be a function but got ' + typeof getter);
   }
 
   dependencies = [].concat.apply([], dependencies);
@@ -71,7 +71,9 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
       }
       return prev[property];
     },
-    set: function () { }
+    set: function () {
+        throw new TypeError('"' + property + '" is a computed property, it can\'t be set directly.');
+    }
   });
 };
 
