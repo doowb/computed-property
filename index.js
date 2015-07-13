@@ -12,6 +12,55 @@ var get = require('get-value');
 var set = require('set-object');
 
 /**
+ * Determine if dependencies have changed.
+ *
+ * @param  {Object}  `depValues` Stored dependency values
+ * @param  {Object}  `current` Current object to check the dependencies.
+ * @param  {Array}   `dependencies` Dependencies to check.
+ * @return {Boolean} Did any dependencies change?
+ * @api private
+ */
+
+function hasChanged (depValues, current, dependencies) {
+  var len = dependencies.length;
+  var i = 0;
+  var result = false;
+  while (len--) {
+    var dep = dependencies[i++];
+    var value = get(current, dep);
+    if (get(depValues, dep) !== value) {
+      result = true;
+      set(depValues, dep, value);
+    }
+  }
+  return result;
+}
+
+/**
+ * Setup the storage object for watching dependencies.
+ *
+ * @param  {Object}  `obj`          Object property is being added to.
+ * @param  {Object}  `depValues`    Object used for storage.
+ * @param  {Array}   `dependencies` Dependencies to watch
+ * @return {Boolean} Return if watching or not.
+ * @api private
+ */
+
+function initWatch (obj, depValues, dependencies) {
+  var len = dependencies.length;
+  if (len === 0) {
+      return false;
+  }
+  var i = 0;
+  while (len--) {
+      var dep = dependencies[i++];
+      var value = cloneDeep(get(obj, dep));
+      set(depValues, dep, value);
+  }
+  return true;
+}
+
+/**
  * Add a computed property to an object. This updates
  * the property when dependent properties are updated.
  *
@@ -40,7 +89,7 @@ var set = require('set-object');
  * ```
  *
  * @param  {Object}   `obj` Object to add the property to.
- * @param  {String} `property` Name of the property.
+ * @param  {String}   `property` Name of the property.
  * @param  {Array}    `dependencies` Optional list of properties to depend on.
  * @param  {Function} `getter` Getter function that does the calculation.
  * @api public
@@ -57,71 +106,23 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
   }
 
   dependencies = [].concat.apply([], dependencies);
-  var prev = {};
-  var isWatching = initWatch(obj, prev, dependencies);
+  var depValues = {};
+  var isWatching = initWatch(obj, depValues, dependencies);
   var wasComputed = false;
+  var computed;
 
   Object.defineProperty(obj, property, {
     configurable: true,
     enumerable: true,
     get: function () {
-      if (!isWatching || !wasComputed || changed(prev, this, dependencies)) {
-        prev[property] = getter.call(this);
+      if (!isWatching || !wasComputed || hasChanged(depValues, this, dependencies)) {
+        computed = getter.call(this);
         wasComputed = true;
       }
-      return prev[property];
+      return computed;
     },
     set: function () {
         throw new TypeError('"' + property + '" is a computed property, it can\'t be set directly.');
     }
   });
 };
-
-/**
- * Setup the storage object for watching dependencies.
- *
- * @param  {Object}  `obj`          Object property is being added to.
- * @param  {Object}  `prev`         Object used for storage.
- * @param  {Array}   `dependencies` Dependencies to watch
- * @return {Boolean} Return if watching or not.
- * @api private
- */
-
-function initWatch (obj, prev, dependencies) {
-  var len = dependencies.length;
-  if (len === 0) {
-      return false;
-  }
-  var i = 0;
-  while (len--) {
-      var dep = dependencies[i++];
-      var value = cloneDeep(get(obj, dep));
-      set(prev, dep, value);
-  }
-  return true;
-}
-
-/**
- * Determine if dependencies have changed.
- *
- * @param  {Object}  `prev` Stored dependency values
- * @param  {Object}  `current` Current object to check the dependencies.
- * @param  {Array}   `dependencies` Dependencies to check.
- * @return {Boolean} Did any dependencies change?
- * @api private
- */
-
-function changed (prev, current, dependencies) {
-  var len = dependencies.length;
-  var i = 0;
-  var result = false;
-  while (len--) {
-    var dep = dependencies[i++];
-    var value = get(current, dep);
-    if (get(prev, dep) !== value) {
-      result = true;
-      set(prev, dep, value);
-    }
-  }
-  return result;
-}
