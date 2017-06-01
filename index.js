@@ -115,9 +115,12 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
     configurable: true,
     enumerable: true,
     get: function () {
-      if (!isWatching || !wasComputed || hasChanged(depValues, this, dependencies)) {
+      if (!wasComputed) {
+        hasChanged(depValues, this, dependencies);
         computed = getter.call(this);
         wasComputed = true;
+      } else if (!isWatching || hasChanged(depValues, this, dependencies)) {
+        computed = getter.call(this);
       }
       return computed;
     },
