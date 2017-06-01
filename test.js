@@ -90,4 +90,18 @@ describe('.computedProperty():', function () {
     obj.name.middle = 'g';
     obj.fullname.should.eql('Brian G. Woodward');
   });
+
+  it('should re-copy values on first run', function () {
+    var obj = {
+      override: undefined,
+      default: 'foo'
+    };
+    computedProperty(obj, 'thingy', ['override'], function () {
+      return this.override || this.default;
+    });
+    obj.override = 'bar';
+    obj.thingy.should.eql('bar');
+    obj.override = undefined;
+    obj.thingy.should.eql('foo');
+  });
 });
