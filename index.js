@@ -1,8 +1,8 @@
 /*!
  * computed-property <https://github.com/doowb/computed-property>
  *
- * Copyright (c) 2014 Brian Woodward, contributors.
- * Licensed under the MIT license.
+ * Copyright (c) 2014-2017, Brian Woodward.
+ * Released under the MIT License.
  */
 
 'use strict';
