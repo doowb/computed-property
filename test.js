@@ -1,49 +1,49 @@
 /*!
  * computed-property <https://github.com/doowb/computed-property>
  *
- * Copyright (c) 2014 Brian Woodward
- * Licensed under the MIT License (MIT)
+ * Copyright (c) 2014-2017, Brian Woodward.
+ * Released under the MIT License.
  */
 
 'use strict';
 
-var should = require('should');
+var assert = require('assert');
 var computedProperty = require('./');
 
-describe('.computedProperty():', function () {
-  it('should add a computed property to an object without dependencies.', function () {
+describe('.computedProperty():', function() {
+  it('should add a computed property to an object without dependencies.', function() {
     var obj = {
       name: 'home',
       ext: '.hbs',
       dirname: 'views'
     };
-    computedProperty(obj, 'path', function () {
+    computedProperty(obj, 'path', function() {
       return this.dirname + '/' + this.name + this.ext;
     });
 
-    obj.path.should.equal('views/home.hbs');
+    assert.equal(obj.path, 'views/home.hbs');
     obj.dirname = '_gh_pages';
     obj.ext = '.html';
-    obj.path.should.equal('_gh_pages/home.html');
+    assert.equal(obj.path, '_gh_pages/home.html');
   });
 
-  it('should add a computed property to an object with dependencies.', function () {
+  it('should add a computed property to an object with dependencies.', function() {
     var obj = {
       name: 'home',
       ext: '.hbs',
       dirname: 'views'
     };
-    computedProperty(obj, 'path', ['ext', 'dirname'], function () {
+    computedProperty(obj, 'path', ['ext', 'dirname'], function() {
       return this.dirname + '/' + this.name + this.ext;
     });
 
-    obj.path.should.equal('views/home.hbs');
+    assert.equal(obj.path, 'views/home.hbs');
     obj.dirname = '_gh_pages';
     obj.ext = '.html';
-    obj.path.should.equal('_gh_pages/home.html');
+    assert.equal(obj.path, '_gh_pages/home.html');
   });
 
-  it('should add a computed property to an object with deep dependencies.', function () {
+  it('should add a computed property to an object with deep dependencies.', function() {
     var obj = {
       name: {
         first: 'Brian',
@@ -51,31 +51,31 @@ describe('.computedProperty():', function () {
         last: 'Woodward'
       }
     };
-    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function () {
+    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function() {
       return this.name.first + ' ' + this.name.last;
     });
 
-    obj.fullname.should.eql('Brian Woodward');
+    assert.equal(obj.fullname, 'Brian Woodward');
     obj.name.first = 'Bryan';
-    obj.fullname.should.eql('Bryan Woodward');
+    assert.equal(obj.fullname, 'Bryan Woodward');
   });
 
-  it('should add a computed property to an object with dependencies where a non dependency changes.', function () {
+  it('should add a computed property to an object with dependencies where a non dependency changes.', function() {
     var obj = {
       name: 'home',
       ext: '.hbs',
       dirname: 'views'
     };
-    computedProperty(obj, 'path', ['ext', 'dirname'], function () {
+    computedProperty(obj, 'path', ['ext', 'dirname'], function() {
       return this.dirname + '/' + this.name + this.ext;
     });
 
-    obj.path.should.equal('views/home.hbs');
+    assert.equal(obj.path, 'views/home.hbs');
     obj.name = 'foo';
-    obj.path.should.equal('views/home.hbs');
+    assert.equal(obj.path, 'views/home.hbs');
   });
 
-  it('should add a computed property to an object with deep dependencies where a non dependency changes.', function () {
+  it('should add a computed property to an object with deep dependencies where a non dependency changes.', function() {
     var obj = {
       name: {
         first: 'Brian',
@@ -83,25 +83,25 @@ describe('.computedProperty():', function () {
         last: 'Woodward'
       }
     };
-    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function () {
+    computedProperty(obj, 'fullname', ['name.first', 'name.last'], function() {
       return this.name.first + ' ' + this.name.middle + '. ' + this.name.last;
     });
-    obj.fullname.should.eql('Brian G. Woodward');
+    assert.equal(obj.fullname, 'Brian G. Woodward');
     obj.name.middle = 'g';
-    obj.fullname.should.eql('Brian G. Woodward');
+    assert.equal(obj.fullname, 'Brian G. Woodward');
   });
 
-  it('should re-copy values on first run', function () {
+  it('should re-copy values on first run', function() {
     var obj = {
       override: undefined,
       default: 'foo'
     };
-    computedProperty(obj, 'thingy', ['override'], function () {
+    computedProperty(obj, 'thingy', ['override'], function() {
       return this.override || this.default;
     });
     obj.override = 'bar';
-    obj.thingy.should.eql('bar');
+    assert.equal(obj.thingy, 'bar');
     obj.override = undefined;
-    obj.thingy.should.eql('foo');
+    assert.equal(obj.thingy, 'foo');
   });
 });

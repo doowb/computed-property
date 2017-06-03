@@ -7,9 +7,9 @@
 
 'use strict';
 
-var cloneDeep = require('lodash.clonedeep');
+var clone = require('clone-deep');
 var get = require('get-value');
-var set = require('set-object');
+var set = require('set-value');
 
 /**
  * Determine if dependencies have changed.
@@ -21,7 +21,7 @@ var set = require('set-object');
  * @api private
  */
 
-function hasChanged (depValues, current, dependencies) {
+function hasChanged(depValues, current, dependencies) {
   var len = dependencies.length;
   var i = 0;
   var result = false;
@@ -46,16 +46,16 @@ function hasChanged (depValues, current, dependencies) {
  * @api private
  */
 
-function initWatch (obj, depValues, dependencies) {
+function initWatch(obj, depValues, dependencies) {
   var len = dependencies.length;
   if (len === 0) {
-      return false;
+    return false;
   }
   var i = 0;
   while (len--) {
-      var dep = dependencies[i++];
-      var value = cloneDeep(get(obj, dep));
-      set(depValues, dep, value);
+    var dep = dependencies[i++];
+    var value = clone(get(obj, dep));
+    set(depValues, dep, value);
   }
   return true;
 }
@@ -88,15 +88,15 @@ function initWatch (obj, depValues, dependencies) {
  *   });
  * ```
  *
+ * @name  computedProperty
  * @param  {Object}   `obj` Object to add the property to.
  * @param  {String}   `property` Name of the property.
  * @param  {Array}    `dependencies` Optional list of properties to depend on.
  * @param  {Function} `getter` Getter function that does the calculation.
  * @api public
- * @name  computedProperty
  */
 
-module.exports = function computedProperty (obj, property, dependencies, getter) {
+module.exports = function computedProperty(obj, property, dependencies, getter) {
   if (typeof dependencies === 'function') {
     getter = dependencies;
     dependencies = [];
@@ -105,7 +105,7 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
     throw new TypeError('Expected `getter` to be a function but got ' + typeof getter);
   }
 
-  dependencies = [].concat.apply([], dependencies);
+  dependencies = dependencies.slice();
   var depValues = {};
   var isWatching = initWatch(obj, depValues, dependencies);
   var wasComputed = false;
@@ -114,7 +114,7 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
   Object.defineProperty(obj, property, {
     configurable: true,
     enumerable: true,
-    get: function () {
+    get: function() {
       if (!wasComputed) {
         hasChanged(depValues, this, dependencies);
         computed = getter.call(this);
@@ -124,8 +124,8 @@ module.exports = function computedProperty (obj, property, dependencies, getter)
       }
       return computed;
     },
-    set: function () {
-        throw new TypeError('"' + property + '" is a computed property, it can\'t be set directly.');
+    set: function() {
+      throw new TypeError('"' + property + '" is a computed property, it can\'t be set directly.');
     }
   });
 };
